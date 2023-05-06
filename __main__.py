@@ -1,18 +1,63 @@
-import argparse
 
-from torch.utils.data import DataLoader
+
+from dataset import create_pg19_data
+from memory import Memory
+from trainer import Trainer
+from bert import BERT, Generator, Discriminator
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    vocab_size = 30522
+    maxlen = 512
+    n_layers = 4
+    d_model = 512
+    n_head = 8
+    p = 0.1
 
-    parser.add_argument("--epochs", type=int, default=100)
-    parser.add_argument("--vocab_size", type=int, default=30522)
-    parser.add_argument("--batch_size", type=int, default=16)
-    parser.add_argument("--lr", type=float, default=1e-4)
-    parser.add_argument("--max_len", type=int, default=512)
-    parser.add_argument("--max_files", type=int, default=10000)
-    parser.add_argument("--worker", type=int, default=2)
+    data = create_pg19_data(max_files=1000)
 
-    args = parser.parse_args()
+    memory = Memory(
+        data=data,
+        dim=d_model
+    )
+
+    bert = BERT(
+        vocab_size=vocab_size,
+        maxlen=maxlen,
+        n_layers=n_layers,
+        d_model=d_model,
+        n_head=n_head,
+        p=p
+    ).cuda()
+
+    generator = Generator(
+        vocab_size=vocab_size,
+        maxlen=maxlen,
+        n_layers=n_layers,
+        d_model=d_model,
+        n_head=n_head,
+        p=p
+    ).cuda()
+
+    discriminator = Discriminator(
+        vocab_size=vocab_size,
+        maxlen=maxlen,
+        n_layers=n_layers,
+        d_model=d_model,
+        n_head=n_head,
+        p=p
+    ).cuda()
+
+    trainer = Trainer(
+        bert=bert,
+        generator=generator,
+        discriminator=discriminator,
+        memory=memory,
+        lr=1e-4,
+        batch_size=32
+    )
+
+    for i in range(100):
+        loss = trainer.train_step()
+        print(loss)
 

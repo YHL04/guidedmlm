@@ -1,48 +1,70 @@
 
+
 import torch
 import torch.nn as nn
 from torch.optim import Adam
 
+import random
 
-import tqdm
 
-
-class BERTTrainer:
+class Trainer:
 
     def __init__(self,
                  bert,
                  generator,
                  discriminator,
-                 train_dataloader,
-                 test_dataloader,
+                 memory,
+                 lr=1e-4,
                  batch_size=32,
-                 lr=1e-4
+                 tau=0.01
                  ):
 
-        self.train_data = train_dataloader
-        self.test_data = test_dataloader
+        self.bert = bert
+        self.generator = generator
+        self.discriminator = discriminator
 
-    def train(self, epoch):
-        self.train_iteration(epoch, self.train_data)
+        self.batch_size = batch_size
+        self.tau = tau
 
-    def test(self, epoch):
-        self.test_iteration(epoch, self.test_data)
+        self.memory = memory
+        self.criterion = nn.NLLLoss(ignore_index=0)
+        self.optimizer = Adam(self.bert.parameters(), lr=lr)
 
-    def train_iteration(self, epoch, data_loader):
-        pass
+    def mask_ids(self, tokens, p):
+        """
+        :param tokens: Tensor[total_len, max_len]
+        :param p:      mask probability
+        """
 
-    def test_iteration(self, epoch, data_loader):
-        pass
+        target = torch.zeros(*tokens.size(), dtype=torch.int64)
 
-    def eval(self, bert_input, bert_target, device="cuda"):
-        pass
+        for i in range(len(tokens)):
+            for j in range(len(tokens)):
+                prob = random.random()
 
-    def update(self, bert_input, bert_target, device="cuda"):
-        pass
+                if prob < p:
+                    # index for [MASK] is 103
+                    target[i][j] = tokens[i][j]
+                    tokens[i][j] = 103
 
-    def bert_loss(self, target, expected):
+            return tokens, target
+
+    def train_step(self):
+        batch = self.memory.get_batch(batch_size=self.batch_size)
+        tokens, target = self.mask_ids(batch)
+
+        expected = self.bert.forward(tokens)
+        loss = self.bert_loss(expected, target)
+        loss.backward()
+
+        self.optimizer.step()
+
+        return loss
+
+    def bert_loss(self, expected, target):
         return self.criterion(expected, target)
 
     def save(self, file_path="saved/trained"):
         bert_path = file_path + ".bert"
         torch.save(self.bert, bert_path)
+

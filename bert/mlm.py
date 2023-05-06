@@ -1,5 +1,5 @@
 
-import torch
+
 import torch.nn as nn
 
 from .transformer import Transformer
@@ -76,7 +76,7 @@ class Discriminator(nn.Module):
     def forward(self, ids, mask_score):
         """
         :param ids:        [batch_size, maxlen]
-               mask_score: [batch_size, maxlen]
+        :param mask_score: [batch_size, maxlen]
         :return:           [batch_size, 1]
         """
 
@@ -86,3 +86,4 @@ class Discriminator(nn.Module):
         x = self.out(x)
 
         return x
+
