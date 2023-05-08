@@ -4,6 +4,10 @@ Proof of concept uses generator to generate mask probability for each word and i
 
 Blue: Standard MLM
 Orange: Guided MLM v1 (Uses 3x more compute for each training step)
+
+First plot: Bert Loss Curve (log scale)
+Second plot: Discriminator Loss Curve (log scale)
+
 ![alt text](images/Figure_1.png)
 
 ![alt text](images/sketch.jpg)
