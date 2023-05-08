@@ -60,8 +60,8 @@ def main():
         batch_size=batch_size
     )
 
-    for i in range(1000):
-        loss = trainer.train_step()
+    for i in range(2000):
+        loss = trainer.train_step_2()
         print(loss)
 
 
