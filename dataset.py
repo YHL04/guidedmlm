@@ -45,20 +45,16 @@ def partition(ids, max_len):
         if book.size(0) > 30:
             books.append(book)
 
-    for book in books:
-        print(book.shape)
-
     return books
 
 
-def create_pg19_data(path="data/pg19/train", max_len=512, total_len=30, max_files=30):
+def create_pg19_data(path="data/train", max_len=512, max_files=30):
     """
     :return: List[Tensor(length, max_len)], None
     """
 
     data = partition(tokenize(read_data(path, max_files=max_files)),
                      max_len=max_len,
-                     total_len=total_len
                      )
 
     return data

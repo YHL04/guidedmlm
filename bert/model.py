@@ -1,6 +1,5 @@
 
 
-import torch
 import torch.nn as nn
 
 from .transformer import Transformer
@@ -13,16 +12,17 @@ class BERT(nn.Module):
 
     def __init__(self,
                  vocab_size,
-                 n_layers=4,
-                 d_model=128,
-                 n_head=8,
-                 p=0.1
+                 max_len,
+                 n_layers,
+                 d_model,
+                 n_head,
+                 p
                  ):
-
         super(BERT, self).__init__()
 
         self.transformer = Transformer(
             vocab_size=vocab_size,
+            max_len=max_len,
             n_layers=n_layers,
             d_model=d_model,
             n_head=n_head,

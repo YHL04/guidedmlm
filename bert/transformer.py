@@ -1,6 +1,5 @@
 
 
-import torch
 import torch.nn as nn
 
 
@@ -15,13 +14,12 @@ class Transformer(nn.Module):
 
     def __init__(self,
                  vocab_size,
-                 max_len=512,
-                 n_layers=12,
-                 d_model=768,
-                 n_head=8,
-                 p=0.1
+                 max_len,
+                 n_layers,
+                 d_model,
+                 n_head,
+                 p
                  ):
-
         super(Transformer, self).__init__()
 
         self.emb = TransformerEmbedding(
@@ -42,7 +40,7 @@ class Transformer(nn.Module):
     def forward(self, ids):
         """
         :param   [batch_size, length]
-        :return: [batch_size, d_model]
+        :return: [batch_size, length, d_model]
         """
         x = self.emb(ids)
 
